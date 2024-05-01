@@ -20,6 +20,8 @@
 
 Electronに似た構造だが、データサイエンスの世界ではJupyter Notebookが多様されるので、FlaskをベースとしたAPIサーバ開発した方が、コード再利用出来て良い。
 
+SQLiteをデータベースとして採用する。SQLiteはPandasと相性が良い、ローカルPC上で動作可能で性能も高い。
+
 [アーキテクチャー図](https://docs.google.com/presentation/d/e/2PACX-1vSTcAQs16wdLKj2Ndpa6pm0MrJLDI1DcmLM6ZNvANhVn1qFPvWvD1FXRj9WBLG1m1_55C8bX7csbp_f/pub?start=false&loop=false&delayms=3000)
 
 ## 部品/フレームワーク
