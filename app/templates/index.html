@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="utf-8">
+  <title>Search</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/css/bootstrap.min.css"
+    integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <script src="{{ url_for('static', filename='js/highlight.js') }}"></script>
+</head>
+
+<body>
+
+  <div class="container">
+    <h1>PDF search with text highlighting</h1>
+
+    <h2>Sources</h2>
+    <ul id="sources"></ul>
+
+    <h2>Search</h2>
+    <form>
+      Keywords: <input id="search" type="text">
+      <input type="button" onclick="searchPDF()" value="Search">
+    </form>
+    <table id="search_result_table" class="table table-bordered mt-3">
+    </table>
+  </div>
+
+  <script>
+    var base_url;
+  </script>
+  <br>
+  <script>
+    const API_BASE_URL = 'http://127.0.0.1:5000';
+    (async () => {
+      const response = await fetch(API_BASE_URL + '/sources');
+      const sources = await response.json();
+      base_url = sources[0].base_url;  // 最初の要素
+      console.log(`getSources: ${JSON.stringify(sources)}`);
+      ul_sources = document.getElementById('sources');
+      sources.forEach(source => {
+        const li = document.createElement('li');
+        li.innerHTML = `<a href=${source.base_url}>${source.org}</a>: ${source.doc}`
+        ul_sources.append(li);
+      })
+    })();
+  </script>
+
+  <script>
+    const search = async (base_url, keywords) => {
+      const path = encodeURI(`/search?base_url=${base_url}&keywords=${keywords}`);
+      const response = await fetch(API_BASE_URL + path);
+      const searchResult = await response.json();
+      console.log(`getSearchResult: ${JSON.stringify(searchResult)}`);
+
+      const searchResultTable = document.getElementById('search_result_table');
+      searchResultTable.innerHTML = '';
+      const tr = document.createElement('tr')
+
+      const columns = ['link_id', 'title', 'page', 'text'];
+      columns.forEach(e => {
+        const th = document.createElement('th');
+        th.innerText = e;
+        tr.append(th);
+      });
+      const thead = document.createElement('thead');
+      thead.setAttribute('class', 'thead-dark');
+      thead.append(tr);
+      searchResultTable.append(thead);
+
+      const tbody = document.createElement('tbody');
+      searchResult.forEach(e => {
+        const tr = document.createElement('tr');
+        columns.forEach(c => {
+          var td = document.createElement('td');
+          switch (c) {
+            case 'text':
+              const spans = []
+              for (key in e.spans) {
+                spans.push(...e.spans[key])
+              }
+              console.log(spans);
+              td.innerHTML = `<div>${highlightText(e[c], spans)}</div>`;
+              break;
+            case 'title':
+              const url_title = encodeURI(`/highlight?link_id=${e.link_id}&page=${e.page}&keywords=${keywords}&all_pages=true`)
+              td.innerHTML = `<a href="${url_title}#page=${e.page+1}">${e.title}</a>`
+              break;
+            case 'page':
+              const url_page = encodeURI(`/highlight?link_id=${e.link_id}&page=${e.page}&keywords=${keywords}`)
+              td.innerHTML = `<a href="${url_page}#page=2">${e.page}</a>`
+              break;
+            default:
+              td.innerText = e[c];
+              break;
+          }
+          tr.append(td);
+        });
+        tbody.append(tr);
+      })
+      searchResultTable.append(tbody);
+    }
+
+    const searchPDF = () => {
+      const keywords = document.getElementById('search').value;
+      search(base_url, keywords);
+    }
+  </script>
+
+</body>
+
+</html>
