@@ -2,7 +2,7 @@
 
 ## 背景
 
-私の[マーテック自習レポジトリ](https://github.com/araobp/Learning-MarTech)よりスピンアウト。社外情報収集ツールとしてPDF検索を開発。
+私の[マーテック自習レポジトリ](https://github.com/araobp/Learning-MarTech)よりスピンアウト。社外情報収集ツールとしてPDF検索を開発。私の趣味として開発するが、仕事でも使えるかもしれない。
 
 ## ゴール
 
