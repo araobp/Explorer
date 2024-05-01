@@ -24,7 +24,7 @@ Electronに似た構造だが、データサイエンスの世界ではJupyter N
 
 SQLiteをデータベースとして採用する。SQLiteはPandasと相性が良い、ローカルPC上で動作可能で性能も高い。
 
-MA/SFA/CRMなどのSaaS、ローコード開発基盤のPaaSは、他のユーザとリソース共有する手前、レスポンスが遅め。実は、ローカルPCこそ、最高の性能を発揮出来る。部署外へ公開しないデータの場合、SaaSでなく、ローカルPC上のクライアント・サーバーの方が、性能や秘密管理の点で優位。
+MA/SFA/CRMなどのSaaS、ローコード開発基盤のPaaSは、他のユーザとリソース共有する手前、レスポンスが遅め。実は、ローカルPCこそ、最高の性能を発揮出来る。部署外へ公開しないデータを活用したアプリの場合、SaaSでなく、ローカルPC上のクライアント・サーバーの方が、性能や秘密管理の点で優位。
 
 [アーキテクチャー図](https://docs.google.com/presentation/d/e/2PACX-1vSTcAQs16wdLKj2Ndpa6pm0MrJLDI1DcmLM6ZNvANhVn1qFPvWvD1FXRj9WBLG1m1_55C8bX7csbp_f/pub?start=false&loop=false&delayms=3000)
 
