@@ -13,24 +13,15 @@
 <body>
 
   <div class="container">
-    <h1>PDF search with text highlighting</h1>
+    <h1>PDF検索エンジン</h1>
 
-    <h2>Sources</h2>
+    <h3>情報源</h3>
     <ul id="sources"></ul>
-
-    <h2>Search</h2>
-
-    <!--
-    <form>
-      Keywords: <input id="search" type="text" class="form-control">
-      <input type="button" class="btn btn-primary" onclick="searchPDF()" value="Search">
-    </form>
-    -->
     
     <form>
       <div class="form-group">
-        <label for="search">Keywords</label>
-        <input type="text" class="form-control" id="search" placeholder="Enter keywords (comma separated)">
+        <label for="search">キーワード</label>
+        <input type="text" class="form-control" id="search" placeholder="キーワード入力（コンマ区切り）">
       </div>
       <input type="button" class="btn btn-primary" onclick="searchPDF()" value="Submit"></input>
     </form>
@@ -61,6 +52,9 @@
 
   <script>
     const search = async (base_url, keywords) => {
+
+      if (keywords.trim() == '') return;
+
       const path = encodeURI(`/search?base_url=${base_url}&keywords=${keywords}`);
       const response = await fetch(API_BASE_URL + path);
       const searchResult = await response.json();
