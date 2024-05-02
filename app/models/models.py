@@ -8,6 +8,7 @@ import io
 
 cwd = os.path.dirname(os.path.abspath(__file__))
 DB_PATH = os.path.join(cwd, "../../database/search.db")
+MARGIN = 120
 
 def to_dict_list(list_, columns):
   dict_list = []
@@ -46,14 +47,45 @@ def select_texts(base_url, keywords):
     original_text = text[3]
     
     spans = {}
+    first_start = len(original_text)
+    last_end = 0
+    
     for m in re.finditer(pattern, original_text):
       keyword = m.group(0)
       if keyword not in spans:
         spans[keyword] = []
-      spans[keyword].append([m.start(), m.end()])
+      
+      start = m.start()
+      end = m.end()
+      spans[keyword].append([start, end])
+      
+      # Detect the smallest start and the largest end
+      first_start = start if start < first_start else first_start
+      last_end = end if end > last_end else last_end
+        
+    # Add margins to the text area
+    #                 Original text
+    #   [          |                  |        ]
+    #          first_start        last_end
+    #
+    first_start = first_start - MARGIN if first_start >= MARGIN else 0
+    last_end = last_end + MARGIN if last_end <= (len(original_text) - MARGIN) else len(original_text)
+    
+    # Cut out the text area from the original one
+    original_text = original_text[first_start:last_end]
+    
+    # Adjust the spans for the cut out area
+    for k, v in spans.items():
+      v_ = []
+      for e in v:
+        v_.append([e[0] - first_start, e[1] - first_start])
+      spans[k] = v_
+      
     text_ = list(text)
+    text_[3] = original_text
     text_.append(spans)
     texts_.append(text_)
+    
   return to_dict_list(texts_, columns=['link_id', 'title', 'page', 'text', 'spans'])
 
 def pdf_highlight(link_id, page, keywords, all_pages):
@@ -64,7 +96,7 @@ def pdf_highlight(link_id, page, keywords, all_pages):
     base_url, path, title = cur.execute(f'SELECT base_url, path, title FROM links WHERE id={link_id}').fetchone()
     
   url = urljoin(base_url, path)
-  print(url)
+  #print(url)
   resp = requests.get(url)
   doc = fitz.open(stream=resp.content)
   

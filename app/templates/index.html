@@ -81,11 +81,11 @@
                 spans.push(...e.spans[key])
               }
               console.log(spans);
-              td.innerHTML = `<div>${highlightText(e[c], spans)}</div>`;
+              td.innerHTML = `<div>...${highlightText(e[c], spans)}...</div>`;
               break;
             case 'title':
               const url_title = encodeURI(`/highlight?link_id=${e.link_id}&page=${e.page}&keywords=${keywords}&all_pages=true`)
-              td.innerHTML = `<a href="${url_title}#page=${e.page+1}">${e.title}</a>`
+              td.innerHTML = `<a href="${url_title}#page=${e.page + 1}">${e.title}</a>`
               break;
             case 'page':
               const url_page = encodeURI(`/highlight?link_id=${e.link_id}&page=${e.page}&keywords=${keywords}`)
@@ -106,6 +106,13 @@
       const keywords = document.getElementById('search').value;
       search(base_url, keywords);
     }
+
+    document.getElementById('search').addEventListener("keypress", event => {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        searchPDF();
+      }
+    });
   </script>
 
 </body>
