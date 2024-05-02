@@ -19,10 +19,22 @@
     <ul id="sources"></ul>
 
     <h2>Search</h2>
+
+    <!--
     <form>
-      Keywords: <input id="search" type="text">
-      <input type="button" onclick="searchPDF()" value="Search">
+      Keywords: <input id="search" type="text" class="form-control">
+      <input type="button" class="btn btn-primary" onclick="searchPDF()" value="Search">
     </form>
+    -->
+    
+    <form>
+      <div class="form-group">
+        <label for="search">Keywords</label>
+        <input type="text" class="form-control" id="search" placeholder="Enter keywords (comma separated)">
+      </div>
+      <input type="button" class="btn btn-primary" onclick="searchPDF()" value="Submit"></input>
+    </form>
+
     <table id="search_result_table" class="table table-bordered mt-3">
     </table>
   </div>
@@ -114,6 +126,10 @@
       }
     });
   </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+    crossorigin="anonymous"></script>
 
 </body>
 
