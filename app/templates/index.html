@@ -15,11 +15,12 @@
   <div class="container">
     <h1>PDF検索エンジン</h1>
 
-    <h3>情報源</h3>
-    <ul id="sources"></ul>
-    
+    <h3 class="mt-3">情報源</h3>
+    <div id="sources">
+    </div>
+
     <form>
-      <div class="form-group">
+      <div class="form-group mt-3">
         <label for="search">キーワード</label>
         <input type="text" class="form-control" id="search" placeholder="キーワード入力（コンマ区切り）">
       </div>
@@ -31,41 +32,53 @@
   </div>
 
   <script>
-    var base_url;
-  </script>
-  <br>
-  <script>
+    var sources;
+
     const API_BASE_URL = 'http://127.0.0.1:5000';
     (async () => {
       const response = await fetch(API_BASE_URL + '/sources');
-      const sources = await response.json();
-      base_url = sources[0].base_url;  // 最初の要素
-      console.log(`getSources: ${JSON.stringify(sources)}`);
-      ul_sources = document.getElementById('sources');
+      sources = await response.json();
+      const sourcesDiv = document.getElementById('sources');
       sources.forEach(source => {
-        const li = document.createElement('li');
-        li.innerHTML = `<a href=${source.base_url}>${source.org}</a>: ${source.doc}`
-        ul_sources.append(li);
+        const div = document.createElement('div');
+        div.setAttribute('class', 'form-check');
+        div.innerHTML = `\
+        <input class="form-check-input" type="checkbox" value="${source.base_url}" id="${source.base_url}" checked>\
+        <label class="form-check-label" for="${source.base_url}">\
+          <a href=${source.homepage_url}>${source.org}</a>: <a href=${source.doc_url}>${source.doc}</a>\
+        </label>\
+        `;
+        sourcesDiv.append(div);
       })
     })();
   </script>
 
   <script>
-    const search = async (base_url, keywords) => {
+    const searchResultTable = document.getElementById('search_result_table');
+
+    const search = (sources, keywords) => {
+      searchResultTable.innerHTML = '';
+
+      sources.forEach(source => {
+        const checkbox = document.getElementById(source.base_url);
+        if (checkbox.checked) {
+          search_(source, keywords);
+        }
+      });
+    }
+
+    const search_ = async (source, keywords) => {
 
       if (keywords.trim() == '') return;
 
-      //const path = encodeURI(`/search?base_url=${base_url}&keywords=${keywords}`);
-      const path = encodeURI(`/search?keywords=${keywords}`);
+      const path = encodeURI(`/search?base_url=${source.base_url}&keywords=${keywords}`);
       const response = await fetch(API_BASE_URL + path);
       const searchResult = await response.json();
-      console.log(`getSearchResult: ${JSON.stringify(searchResult)}`);
+      //console.log(`getSearchResult: ${JSON.stringify(searchResult)}`);
 
-      const searchResultTable = document.getElementById('search_result_table');
-      searchResultTable.innerHTML = '';
       const tr = document.createElement('tr')
 
-      const columns = ['link_id', 'title', 'page', 'text'];
+      const columns = ['doc', 'title', 'page', 'text'];
       columns.forEach(e => {
         const th = document.createElement('th');
         th.innerText = e;
@@ -87,7 +100,7 @@
               for (key in e.spans) {
                 spans.push(...e.spans[key])
               }
-              console.log(spans);
+              //console.log(spans);
               td.innerHTML = `<div>...${highlightText(e[c], spans)}...</div>`;
               break;
             case 'title':
@@ -97,6 +110,9 @@
             case 'page':
               const url_page = encodeURI(`/highlight?link_id=${e.link_id}&page=${e.page}&keywords=${keywords}`)
               td.innerHTML = `<a href="${url_page}#page=2">${e.page}</a>`
+              break;
+            case 'doc':
+              td.innerHTML = `<a href="${source.doc_url}">${source.doc}</a>`
               break;
             default:
               td.innerText = e[c];
@@ -111,7 +127,7 @@
 
     const searchPDF = () => {
       const keywords = document.getElementById('search').value;
-      search(base_url, keywords);
+      search(sources, keywords);
     }
 
     document.getElementById('search').addEventListener("keypress", event => {

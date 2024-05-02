@@ -30,8 +30,8 @@ def to_dict_list(list_, columns):
 def select_sources():
     with sqlite3.connect(DB_PATH) as conn:
         cur = conn.cursor()
-        sources = cur.execute("SELECT base_url, org, doc FROM sources").fetchall()
-    return to_dict_list(sources, columns=["base_url", "org", "doc"])
+        sources = cur.execute("SELECT base_url, homepage_url, org, doc, doc_url FROM sources").fetchall()
+    return to_dict_list(sources, columns=["base_url", "homepage_url", "org", "doc", "doc_url"])
 
 
 def select_texts(base_url, keywords):
