@@ -40,9 +40,14 @@ def select_texts(base_url, keywords):
 
     with sqlite3.connect(DB_PATH) as conn:
         cur = conn.cursor()
-        texts = cur.execute(
-            f'SELECT texts.link_id, links.title, texts.page, texts.text FROM texts INNER JOIN links ON texts.link_id = links.id WHERE links.base_url="{base_url}" AND ({conditions})'
-        ).fetchall()
+        if base_url is None:
+            texts = cur.execute(
+                f'SELECT texts.link_id, links.title, texts.page, texts.text FROM texts INNER JOIN links ON texts.link_id = links.id WHERE ({conditions})'
+            ).fetchall()
+        else:
+            texts = cur.execute(
+                f'SELECT texts.link_id, links.title, texts.page, texts.text FROM texts INNER JOIN links ON texts.link_id = links.id WHERE links.base_url="{base_url}" AND ({conditions})'
+            ).fetchall()
 
     texts_ = []
     for text in texts:

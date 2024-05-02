@@ -55,7 +55,8 @@
 
       if (keywords.trim() == '') return;
 
-      const path = encodeURI(`/search?base_url=${base_url}&keywords=${keywords}`);
+      //const path = encodeURI(`/search?base_url=${base_url}&keywords=${keywords}`);
+      const path = encodeURI(`/search?keywords=${keywords}`);
       const response = await fetch(API_BASE_URL + path);
       const searchResult = await response.json();
       console.log(`getSearchResult: ${JSON.stringify(searchResult)}`);
