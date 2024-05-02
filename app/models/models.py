@@ -1,7 +1,7 @@
 import os
 import sqlite3
 import re
-from urllib.parse import urljoin
+#from urllib.parse import urljoin  
 import requests
 import fitz
 import io
@@ -10,6 +10,10 @@ cwd = os.path.dirname(os.path.abspath(__file__))
 DB_PATH = os.path.join(cwd, "../../database/search.db")
 MARGIN = 120
 
+# Reference: https://stackoverflow.com/questions/67558627/problem-while-joining-two-url-components-with-urllib
+# urljoinは使わない方が良い。スラッシュありなしで結果が異なるため。
+def joinurl(baseurl, path):
+    return '/'.join([baseurl.rstrip('/'), path.lstrip('/')])
 
 def to_dict_list(list_, columns):
     dict_list = []
@@ -113,7 +117,7 @@ def pdf_highlight(link_id, page, keywords, all_pages):
             f"SELECT base_url, path, title FROM links WHERE id={link_id}"
         ).fetchone()
 
-    url = urljoin(base_url, path)
+    url = joinurl(base_url, path)
     # print(url)
     resp = requests.get(url)
     doc = fitz.open(stream=resp.content)
