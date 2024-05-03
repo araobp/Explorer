@@ -37,5 +37,6 @@ O'Reillyの実践自然言語処理 7.1 情報検索を参考にアーキテク�
 
 現在のインプリは、経産省、総務省、防衛省発行の白書を検査出来る状態。TF-IDFを適用した検索順位づけ機能を追加予定。
 
-- [Crawler.ipynb](Crawler.ipynb)
-- [Flaskアプリ](./app)
+- [Crawler.ipynb](Crawler.ipynb) -- 各省庁発行白書のindexページからPDF資料のハイパーリンク抽出する部分、Jupter Notebook上だと開発しやすい。
+- [Database](database) -- SQLiteのデータベースファイル。仕事でこのアプリを利用する場合、このファイルをBox上の共有フォルダへ置くと良い。
+- [Flaskアプリ](./app) -- 実装が完了したらPyInstallerでEXEに固める予定。そうすると、Box上のフォルダを共有する職場の同僚へ配布しやすくなる。
