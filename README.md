@@ -42,3 +42,13 @@ O'Reillyの実践自然言語処理 7.1 情報検索を参考にアーキテク�
 - [Crawler.ipynb](Crawler.ipynb) -- 各省庁発行白書のindexページからPDF資料のハイパーリンク抽出する部分、Jupter Notebook上だと開発しやすい。
 - [Database](database) -- SQLiteのデータベースファイル。仕事でこのアプリを利用する場合、このファイルをBox上の共有フォルダへ置くと良い。
 - [Flaskアプリ](./app) -- 実装が完了したらPyInstallerでEXEに固める予定。そうすると、Box上のフォルダを共有する職場の同僚へ配布しやすくなる。
+
+## 利用
+
+APIサーバの起動。
+```
+$ cd app
+$ python app.py
+```
+
+APIサーバ起動後、ブラウザで"http://127.0.0.1:5000"にアクセス。
