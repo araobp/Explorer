@@ -1,8 +1,5 @@
 import os
 import sqlite3
-import re
-
-# from urllib.parse import urljoin
 import requests
 import fitz
 import io

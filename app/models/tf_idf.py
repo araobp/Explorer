@@ -8,6 +8,23 @@ import math
 # nlp = spacy.load("ja_core_news_sm")
 nlp = spacy.blank("ja")
 
+
+def generate_span_dict(matcher, doc):
+    cnt = {}
+    span_dict = {}
+    matches = matcher(doc, as_spans=True)
+
+    for span in matches:
+        if span.text not in cnt:
+            cnt[span.text] = 0
+        cnt[span.text] += 1
+        if span.text not in span_dict:
+            span_dict[span.text] = []
+        span_dict[span.text].append([span.start_char, span.end_char])
+
+    return (span_dict, cnt)
+
+
 """
 TF-IDF無しの単純なトークンベースマッチ
 
@@ -28,20 +45,11 @@ def simple_match(keywords, texts):
     result = []
     idx = 0
     for doc in nlp.pipe(texts):
-        cnt = {}
-        span_dict = {}
-        matches = matcher(doc, as_spans=True)
-        for span in matches:
-            if span.text not in cnt:
-                cnt[span.text] = 0
-            cnt[span.text] += 1
-            if span.text not in span_dict:
-                span_dict[span.text] = []
-            span_dict[span.text].append([span.start_char, span.end_char])
+        span_dict, _ = generate_span_dict(matcher, doc)
 
         if len(span_dict) != 0:
-          result.append([0.0, idx, span_dict, texts[idx]])
-  
+            result.append([0.0, idx, span_dict, texts[idx]])
+
         idx += 1
 
     return result
@@ -76,17 +84,8 @@ def calc_tf_idf(keywords, texts):
         all_span = []
 
         for doc in nlp.pipe(texts):
-            cnt = {}
-            span_dict = {}
-            # print(f'[len {len(doc)}]', end=' ')
-            matches = matcher(doc, as_spans=True)
-            for span in matches:
-                if span.text not in cnt:
-                    cnt[span.text] = 0
-                cnt[span.text] += 1
-                if span.text not in span_dict:
-                    span_dict[span.text] = []
-                span_dict[span.text].append([span.start_char, span.end_char])
+            
+            span_dict, cnt = generate_span_dict(matcher, doc)
 
             # print(cnt)
             tf = {}
