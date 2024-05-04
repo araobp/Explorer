@@ -8,6 +8,44 @@ import math
 # nlp = spacy.load("ja_core_news_sm")
 nlp = spacy.blank("ja")
 
+"""
+TF-IDF無しの単純なトークンベースマッチ
+
+出力例
+
+ [[{'勉強': [[3, 5]], '犬': [[14, 15], [38, 39]]}],
+ [{'勉強': [[8, 10], [13, 15]]}],
+ [{'勉強': [[0, 2]]}],
+ [{'犬': [[15, 16]]}]]
+"""
+
+
+def simple_match(keywords, texts):
+    patterns = [nlp(e) for e in keywords]
+    matcher = PhraseMatcher(nlp.vocab)
+    matcher.add("SimpleMatch", patterns)
+
+    result = []
+    idx = 0
+    for doc in nlp.pipe(texts):
+        cnt = {}
+        span_dict = {}
+        matches = matcher(doc, as_spans=True)
+        for span in matches:
+            if span.text not in cnt:
+                cnt[span.text] = 0
+            cnt[span.text] += 1
+            if span.text not in span_dict:
+                span_dict[span.text] = []
+            span_dict[span.text].append([span.start_char, span.end_char])
+
+        if len(span_dict) != 0:
+          result.append([0.0, idx, span_dict, texts[idx]])
+  
+        idx += 1
+
+    return result
+
 
 """
 TF-IDF計算関数

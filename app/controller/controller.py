@@ -24,12 +24,13 @@ def sources():
 def search():
     base_url = request.args.get("base_url", default=None, type=str)
     keywords = request.args.get("keywords", default=None, type=str)
-    tf_idf = request.args.get("tf_idf", default="true", type=str)
+    tf_idf = request.args.get("tf-idf", default="true", type=str)
 
+    tf_idf_ = False
     if tf_idf == "true":
-        return jsonify(models.select_texts_sorted(base_url, keywords))
-    else:
-        return jsonify(models.select_texts(base_url, keywords))
+        tf_idf_ = True
+
+    return jsonify(models.select_texts(base_url, keywords, tf_idf_))
 
 
 @main.route("/highlight")
