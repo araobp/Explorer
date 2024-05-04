@@ -9,6 +9,7 @@ from .tf_idf import calc_tf_idf, simple_match
 cwd = os.path.dirname(os.path.abspath(__file__))
 DB_PATH = os.path.join(cwd, "../../database/search.db")
 MARGIN = 120
+LIMIT = 20
 
 
 # Reference: https://stackoverflow.com/questions/67558627/problem-while-joining-two-url-components-with-urllib
@@ -33,29 +34,35 @@ def select_sources():
     with sqlite3.connect(DB_PATH) as conn:
         cur = conn.cursor()
         sources = cur.execute(
-            "SELECT base_url, homepage_url, org, doc, doc_url FROM sources"
+            "SELECT source_id, base_url, homepage_url, org, doc, doc_url FROM sources"
         ).fetchall()
     return to_dict_list(
-        sources, columns=["base_url", "homepage_url", "org", "doc", "doc_url"]
+        sources,
+        columns=["source_id", "base_url", "homepage_url", "org", "doc", "doc_url"],
     )
 
-def select_texts(base_url, keywords, tf_idf=True):
+
+def select_texts(source_id, keywords, tf_idf, limit):
     keywords = [e.strip() for e in keywords.split(",")]
     keywords_ = [f'texts.text LIKE "%{e}%"' for e in keywords]
     conditions = " OR ".join(keywords_)
 
     with sqlite3.connect(DB_PATH) as conn:
         cur = conn.cursor()
-        if base_url is None:
+        if source_id is None:
             texts = cur.execute(
-                f"SELECT texts.link_id, links.title, texts.page, texts.text FROM texts INNER JOIN links ON texts.link_id = links.id WHERE ({conditions})"
+                f"SELECT links.source_id, texts.link_id, links.title, texts.page, texts.text \
+                    FROM texts INNER JOIN links ON texts.link_id = links.link_id \
+                        WHERE ({conditions}) LIMIT {limit}"
             ).fetchall()
         else:
             texts = cur.execute(
-                f'SELECT texts.link_id, links.title, texts.page, texts.text FROM texts INNER JOIN links ON texts.link_id = links.id WHERE links.base_url="{base_url}" AND ({conditions})'
+                f'SELECT links.source_id, texts.link_id, links.title, texts.page, texts.text \
+                    FROM texts INNER JOIN links ON texts.link_id = links.link_id \
+                        WHERE links.source_id="{source_id}" AND ({conditions}) LIMIT {limit}'
             ).fetchall()
 
-    original_texts = [e[3] for e in texts]
+    original_texts = [e[4] for e in texts]
 
     if tf_idf:
         sorted = calc_tf_idf(keywords, original_texts)
@@ -104,14 +111,19 @@ def select_texts(base_url, keywords, tf_idf=True):
             spans[k] = v_
 
         idx = doc_data[1]
-        link_id = texts[idx][0]
-        title = texts[idx][1]
-        page = texts[idx][2]
+        text_ = texts[idx]
 
-        texts_.append([link_id, title, page, original_text, spans])
+        source_id_ = text_[0]
+        link_id = text_[1]
+        title = text_[2]
+        page = text_[3]
 
-        #print(texts_)
-    return to_dict_list(texts_, columns=["link_id", "title", "page", "text", "spans"])
+        texts_.append([source_id_, link_id, title, page, original_text, spans])
+
+        # print(texts_)
+    return to_dict_list(
+        texts_, columns=["source_id", "link_id", "title", "page", "text", "spans"]
+    )
 
 
 def pdf_highlight(link_id, page, keywords, all_pages):
@@ -120,7 +132,9 @@ def pdf_highlight(link_id, page, keywords, all_pages):
     with sqlite3.connect(DB_PATH) as conn:
         cur = conn.cursor()
         base_url, path, title = cur.execute(
-            f"SELECT base_url, path, title FROM links WHERE id={link_id}"
+            f"SELECT sources.base_url, links.path, links.title FROM links \
+                INNER JOIN sources ON sources.source_id = links.source_id \
+                WHERE links.link_id={link_id}"
         ).fetchone()
 
     url = joinurl(base_url, path)
@@ -157,6 +171,4 @@ def pdf_highlight(link_id, page, keywords, all_pages):
 
 
 if __name__ == "__main__":
-    print(
-        select_texts_sorted("https://www.meti.go.jp", "ニュージーランド,オーストラリア")
-    )
+    print(select_texts("https://www.meti.go.jp", "ニュージーランド,オーストラリア"))

@@ -6,6 +6,8 @@ sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 from flask import Blueprint, render_template, jsonify, request, send_file
 from models import models
 
+LIMIT = 200  # SQLiteで検索するレコード数上限のデフォルト値
+
 main = Blueprint("main", __name__)
 
 
@@ -22,15 +24,16 @@ def sources():
 
 @main.route("/search")
 def search():
-    base_url = request.args.get("base_url", default=None, type=str)
+    source_id = request.args.get("source_id", default=None, type=str)
     keywords = request.args.get("keywords", default=None, type=str)
     tf_idf = request.args.get("tf-idf", default="true", type=str)
+    limit = request.args.get("limit", default=LIMIT, type=int)
 
     tf_idf_ = False
     if tf_idf == "true":
         tf_idf_ = True
 
-    return jsonify(models.select_texts(base_url, keywords, tf_idf_))
+    return jsonify(models.select_texts(source_id, keywords, tf_idf_, limit))
 
 
 @main.route("/highlight")

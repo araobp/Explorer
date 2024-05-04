@@ -9,6 +9,13 @@ import math
 nlp = spacy.blank("ja")
 
 
+def generate_matcher(keywords, name):
+    patterns = [nlp(e) for e in keywords]
+    matcher = PhraseMatcher(nlp.vocab)
+    matcher.add(name, patterns)
+    return matcher
+
+
 def generate_span_dict(matcher, doc):
     cnt = {}
     span_dict = {}
@@ -38,9 +45,7 @@ TF-IDF無しの単純なトークンベースマッチ
 
 
 def simple_match(keywords, texts):
-    patterns = [nlp(e) for e in keywords]
-    matcher = PhraseMatcher(nlp.vocab)
-    matcher.add("SimpleMatch", patterns)
+    matcher = generate_matcher(keywords, "simple match")
 
     result = []
     idx = 0
@@ -75,16 +80,14 @@ TF-IDF計算関数
 
 
 def calc_tf_idf(keywords, texts):
-    patterns = [nlp(e) for e in keywords]
-    matcher = PhraseMatcher(nlp.vocab)
-    matcher.add("TF-IDF", patterns)
+    matcher = generate_matcher(keywords, "TF-IDF")
 
     def tf(texts):
         all_tf = []
         all_span = []
 
         for doc in nlp.pipe(texts):
-            
+
             span_dict, cnt = generate_span_dict(matcher, doc)
 
             # print(cnt)
