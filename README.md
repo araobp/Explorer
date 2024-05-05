@@ -31,7 +31,7 @@ O'Reillyの実践自然言語処理 7.1 情報検索を参考にアーキテク�
 - Jupyter Notebook, PyMuPDF, spaCy
 - SQLite
 - Flask
-- HTML5, Bootstrap
+- HTML5, Bootstrap5
 
 ## コード
 
