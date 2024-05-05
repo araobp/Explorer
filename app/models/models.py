@@ -18,6 +18,10 @@ def joinurl(baseurl, path):
     return "/".join([baseurl.rstrip("/"), path.lstrip("/")])
 
 
+def split_keywords(keywords):
+    return [e.replace("、", ",").strip() for e in keywords.split(",")]
+
+
 def to_dict_list(list_, columns):
     dict_list = []
     for e in list_:
@@ -44,7 +48,7 @@ def select_sources():
 
 def select_texts(source_ids, keywords, and_cond_, tokenize_, tf_idf, limit):
 
-    keywords = [e.strip() for e in keywords.split(",")]
+    keywords = split_keywords(keywords)
     keywords_ = [f'(texts.text GLOB "*{e}*")' for e in keywords]
     like_cond = " AND " if and_cond_ else " OR "
     conditions_keywords = like_cond.join(keywords_)
@@ -132,8 +136,9 @@ def select_texts(source_ids, keywords, and_cond_, tokenize_, tf_idf, limit):
     )
 
 
+# [Caveat] トークン化した検索ではないので、常にtokenize=Falseで検索した場合のハイライトになる。
 def pdf_highlight(link_id, page, keywords, all_pages):
-    keywords = [e.strip() for e in keywords.split(",")]
+    keywords = split_keywords(keyword)
 
     with sqlite3.connect(DB_PATH) as conn:
         cur = conn.cursor()
