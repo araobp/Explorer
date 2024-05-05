@@ -51,4 +51,8 @@ $ cd app
 $ python app.py
 ```
 
+## リンク
+
+- [政府について -- 白書等](https://www.e-gov.go.jp/about-government/white-papers.html)
+
 APIサーバ起動後、ブラウザで http://127.0.0.1:5000 にアクセス。
