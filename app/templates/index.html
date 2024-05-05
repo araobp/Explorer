@@ -123,7 +123,7 @@
         and_ = "false";
       }
 
-      console.log(and, and_);
+      //console.log(and, and_);
 
       var tf_idf_ = "true";
       if (tf_idf === false) {
@@ -139,7 +139,7 @@
 
       const response = await fetch(API_BASE_URL + path);
       const searchResult = await response.json();
-      console.log(`getSearchResult: ${JSON.stringify(searchResult)}`);
+      //console.log(`getSearchResult: ${JSON.stringify(searchResult)}`);
 
       const tr = document.createElement('tr')
 
@@ -165,7 +165,7 @@
                 spans.push(...e.spans[key])
               }
               const sortedSpans = spans.sort(function(a, b) { return a[0] - b[0]; });
-              console.log(sortedSpans);
+              //console.log(sortedSpans);
               td.innerHTML = `<div>...${highlightText(e[c], sortedSpans)}...</div>`;
               break;
             case 'title':
