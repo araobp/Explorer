@@ -42,24 +42,29 @@ def select_sources():
     )
 
 
-def select_texts(source_id, keywords, tf_idf, limit):
+def select_texts(source_ids, keywords, tf_idf, limit):
+
     keywords = [e.strip() for e in keywords.split(",")]
     keywords_ = [f'texts.text LIKE "%{e}%"' for e in keywords]
-    conditions = " OR ".join(keywords_)
+    conditions_keywords = " OR ".join(keywords_)
 
     with sqlite3.connect(DB_PATH) as conn:
         cur = conn.cursor()
-        if source_id is None:
+        if source_ids is None:
             texts = cur.execute(
                 f"SELECT links.source_id, texts.link_id, links.title, texts.page, texts.text \
                     FROM texts INNER JOIN links ON texts.link_id = links.link_id \
-                        WHERE ({conditions}) LIMIT {limit}"
+                        WHERE ({conditions_keywords}) LIMIT {limit}"
             ).fetchall()
         else:
+            source_ids = [e.strip() for e in source_ids.split(",")]
+            source_ids_ = [f'links.source_id = {int(e)}' for e in source_ids]
+            conditions_source_ids = " OR ".join(source_ids_)
+
             texts = cur.execute(
                 f'SELECT links.source_id, texts.link_id, links.title, texts.page, texts.text \
                     FROM texts INNER JOIN links ON texts.link_id = links.link_id \
-                        WHERE links.source_id="{source_id}" AND ({conditions}) LIMIT {limit}'
+                        WHERE ({conditions_source_ids}) AND ({conditions_keywords}) LIMIT {limit}'
             ).fetchall()
 
     original_texts = [e[4] for e in texts]

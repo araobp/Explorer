@@ -24,7 +24,7 @@ def sources():
 
 @main.route("/search")
 def search():
-    source_id = request.args.get("source_id", default=None, type=str)
+    source_ids = request.args.get("source_ids", default=None, type=str)
     keywords = request.args.get("keywords", default=None, type=str)
     tf_idf = request.args.get("tf-idf", default="true", type=str)
     limit = request.args.get("limit", default=LIMIT, type=int)
@@ -33,7 +33,7 @@ def search():
     if tf_idf == "true":
         tf_idf_ = True
 
-    return jsonify(models.select_texts(source_id, keywords, tf_idf_, limit))
+    return jsonify(models.select_texts(source_ids, keywords, tf_idf_, limit))
 
 
 @main.route("/highlight")

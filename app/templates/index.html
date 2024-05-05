@@ -89,18 +89,22 @@
       searchResultTable.innerHTML = '';
 
       if (select_mode === true) {
+        const sourceIds = [];
         sources.forEach(source => {
           const checkbox = document.getElementById(source.base_url);
           if (checkbox.checked) {
-            search_(source, keywords, tf_idf, limit);
+            sourceIds.push(source.source_id);
           }
         });
+
+        search_(sourceIds, keywords, tf_idf, limit);
+
       } else {
         search_(null, keywords, tf_idf, limit);
       }
     }
 
-    const search_ = async (source, keywords, tf_idf, limit) => {
+    const search_ = async (sourceIds, keywords, tf_idf, limit) => {
 
       if (keywords.trim() == '') return;
 
@@ -110,10 +114,10 @@
       }
 
       var pass;
-      if (source === null) {
+      if (sourceIds === null) {
         path = encodeURI(`/search?keywords=${keywords}&tf-idf=${tf_idf_}&limit=${limit}`);
       } else {
-        path = encodeURI(`/search?source_id=${source.source_id}&keywords=${keywords}&tf-idf=${tf_idf_}&limit=${limit}`);
+        path = encodeURI(`/search?source_ids=${sourceIds.join(',')}&keywords=${keywords}&tf-idf=${tf_idf_}&limit=${limit}`);
       }
 
       const response = await fetch(API_BASE_URL + path);
