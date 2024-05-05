@@ -4,16 +4,45 @@
 import spacy
 from spacy.matcher import PhraseMatcher
 import math
+import re
 
 # nlp = spacy.load("ja_core_news_sm")
 nlp = spacy.blank("ja")
 
 
-def generate_matcher(keywords, name):
-    patterns = [nlp(e) for e in keywords]
-    matcher = PhraseMatcher(nlp.vocab)
-    matcher.add(name, patterns)
-    return matcher
+class Span:
+
+    def __init__(self, text, start_char, end_char):
+        self.text = text
+        self.start_char = start_char
+        self.end_char = end_char
+
+
+class RegexMatcher:
+
+    def __init__(self, keywords):
+        self.pattern = f'{"|".join(keywords)}'
+
+    # as_spans 引数は使わない：spaCyのPhraseMatcherと合わせるため便箋上確保した引数。
+    def __call__(self, doc, as_spans=True):
+        original_text = doc.text
+        print(original_text)
+        spans = []
+        for m in re.finditer(self.pattern, original_text):
+            keyword = m.group(0)
+            span = Span(text=keyword, start_char=m.start(), end_char=m.end())
+            spans.append(span)
+        return spans
+
+
+def generate_matcher(keywords, name, tokenize=True):
+    if tokenize:
+        patterns = [nlp(e) for e in keywords]
+        matcher = PhraseMatcher(nlp.vocab)
+        matcher.add(name, patterns)
+        return matcher
+    else:
+        return RegexMatcher(keywords)
 
 
 def generate_span_dict(matcher, doc):
@@ -44,8 +73,8 @@ TF-IDF無しの単純なトークンベースマッチ
 """
 
 
-def simple_match(keywords, texts):
-    matcher = generate_matcher(keywords, "simple match")
+def simple_match(keywords, texts, tokenize=True):
+    matcher = generate_matcher(keywords, "simple match", tokenize)
 
     result = []
     idx = 0
@@ -79,8 +108,8 @@ TF-IDF計算関数
 """
 
 
-def calc_tf_idf(keywords, texts):
-    matcher = generate_matcher(keywords, "TF-IDF")
+def calc_tf_idf(keywords, texts, tokenize=True):
+    matcher = generate_matcher(keywords, "TF-IDF", tokenize)
 
     def tf(texts):
         all_tf = []

@@ -33,6 +33,11 @@
         </div>
 
         <div class="form-check form-switch">
+          <input class="form-check-input" type="checkbox" role="switch" id="tokenize">
+          <label class="form-check-label" for="tokenize">トークン化</label>
+        </div>
+
+        <div class="form-check form-switch">
           <input class="form-check-input" type="checkbox" role="switch" id="tf-idf" checked>
           <label class="form-check-label" for="tf-idf">TF-IDF</label>
         </div>
@@ -93,8 +98,13 @@
     const search = (sources, limit) => {
       const keywords = document.getElementById('search').value;
       const and = document.getElementById('and').checked;
+      const tokenize = document.getElementById('tokenize').checked;
       const tf_idf = document.getElementById('tf-idf').checked;
       const select_source = document.getElementById('select-source').checked;
+
+      const and_ = and ? "true" : false;
+      const tokenize_ = tokenize ? "true" : false;
+      const tf_idf_ = tf_idf ? "true" : false;
 
       searchResultTable.innerHTML = '';
 
@@ -107,34 +117,22 @@
           }
         });
 
-        search_(sourceIds, keywords, and, tf_idf, limit);
+        search_(sourceIds, keywords, and_, tokenize_, tf_idf_, limit);
 
       } else {
-        search_(null, keywords, and, tf_idf, limit);
+        search_(null, keywords, and_, tokenize_, tf_idf_, limit);
       }
     }
 
-    const search_ = async (sourceIds, keywords, and, tf_idf, limit) => {
+    const search_ = async (sourceIds, keywords, and, tokenize, tf_idf, limit) => {
 
       if (keywords.trim() == '') return;
 
-      var and_ = "true";
-      if (and === false) {
-        and_ = "false";
-      }
-
-      //console.log(and, and_);
-
-      var tf_idf_ = "true";
-      if (tf_idf === false) {
-        tf_idf_ = "false"
-      }
-
       var pass;
       if (sourceIds === null) {
-        path = encodeURI(`/search?keywords=${keywords}&and=${and_}&tf-idf=${tf_idf_}&limit=${limit}`);
+        path = encodeURI(`/search?keywords=${keywords}&and=${and}&tokenize=${tokenize}&tf-idf=${tf_idf}&limit=${limit}`);
       } else {
-        path = encodeURI(`/search?source_ids=${sourceIds.join(',')}&keywords=${keywords}&and=${and_}&tf-idf=${tf_idf_}&limit=${limit}`);
+        path = encodeURI(`/search?source_ids=${sourceIds.join(',')}&keywords=${keywords}&and=${and}&tokenize=${tokenize}&tf-idf=${tf_idf}&limit=${limit}`);
       }
 
       const response = await fetch(API_BASE_URL + path);
@@ -164,7 +162,7 @@
               for (key in e.spans) {
                 spans.push(...e.spans[key])
               }
-              const sortedSpans = spans.sort(function(a, b) { return a[0] - b[0]; });
+              const sortedSpans = spans.sort(function (a, b) { return a[0] - b[0]; });
               //console.log(sortedSpans);
               td.innerHTML = `<div>...${highlightText(e[c], sortedSpans)}...</div>`;
               break;

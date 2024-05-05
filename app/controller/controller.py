@@ -27,13 +27,15 @@ def search():
     source_ids = request.args.get("source_ids", default=None, type=str)
     keywords = request.args.get("keywords", default=None, type=str)
     and_cond = request.args.get("and", default="true", type=str)
+    tokenize = request.args.get("tokenize", default="true", type=str)
     tf_idf = request.args.get("tf-idf", default="true", type=str)
     limit = request.args.get("limit", default=LIMIT, type=int)
 
     and_cond_ = True if and_cond == "true" else False
+    tokenize_ = True if tokenize == "true" else False
     tf_idf_ = True if tf_idf == "true" else False
 
-    return jsonify(models.select_texts(source_ids, keywords, and_cond_, tf_idf_, limit))
+    return jsonify(models.select_texts(source_ids, keywords, and_cond_, tokenize_, tf_idf_, limit))
 
 
 @main.route("/highlight")

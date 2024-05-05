@@ -42,13 +42,12 @@ def select_sources():
     )
 
 
-def select_texts(source_ids, keywords, and_cond_, tf_idf, limit):
+def select_texts(source_ids, keywords, and_cond_, tokenize_, tf_idf, limit):
 
     keywords = [e.strip() for e in keywords.split(",")]
     keywords_ = [f'(texts.text GLOB "*{e}*")' for e in keywords]
     like_cond = " AND " if and_cond_ else " OR "
     conditions_keywords = like_cond.join(keywords_)
-    print(conditions_keywords)
 
     with sqlite3.connect(DB_PATH) as conn:
         cur = conn.cursor()
@@ -60,21 +59,21 @@ def select_texts(source_ids, keywords, and_cond_, tf_idf, limit):
             ).fetchall()
         else:
             source_ids = [e.strip() for e in source_ids.split(",")]
-            source_ids_ = [f'links.source_id = {int(e)}' for e in source_ids]
+            source_ids_ = [f"links.source_id = {int(e)}" for e in source_ids]
             conditions_source_ids = " OR ".join(source_ids_)
 
             texts = cur.execute(
-                f'SELECT links.source_id, texts.link_id, links.title, texts.page, texts.text \
+                f"SELECT links.source_id, texts.link_id, links.title, texts.page, texts.text \
                     FROM texts INNER JOIN links ON texts.link_id = links.link_id \
-                        WHERE ({conditions_source_ids}) AND ({conditions_keywords}) LIMIT {limit}'
+                        WHERE ({conditions_source_ids}) AND ({conditions_keywords}) LIMIT {limit}"
             ).fetchall()
 
     original_texts = [e[4] for e in texts]
 
     if tf_idf:
-        sorted = calc_tf_idf(keywords, original_texts)
+        sorted = calc_tf_idf(keywords, original_texts, tokenize_)
     else:
-        sorted = simple_match(keywords, original_texts)
+        sorted = simple_match(keywords, original_texts, tokenize_)
 
     texts_ = []
 
@@ -153,8 +152,9 @@ def pdf_highlight(link_id, page, keywords, all_pages):
 
     if all_pages == "true":
         for page in doc:
+            rects = []
             for keyword in keywords:
-                rects = page.search_for(keyword)
+                rects.extend(page.search_for(keyword))
             page.add_highlight_annot(rects)
 
         pdf = io.BytesIO(doc.tobytes())
@@ -165,8 +165,9 @@ def pdf_highlight(link_id, page, keywords, all_pages):
         pages = doc[from_page : to_page + 1]
 
         for page in pages:
+            rects = []
             for keyword in keywords:
-                rects = page.search_for(keyword)
+                rects.extend(page.search_for(keyword))
             page.add_highlight_annot(rects)
 
         doc2 = fitz.open()
