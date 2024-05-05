@@ -26,7 +26,7 @@ class RegexMatcher:
     # as_spans 引数は使わない：spaCyのPhraseMatcherと合わせるため便箋上確保した引数。
     def __call__(self, doc, as_spans=True):
         original_text = doc.text
-        print(original_text)
+        #print(original_text)
         spans = []
         for m in re.finditer(self.pattern, original_text):
             keyword = m.group(0)
