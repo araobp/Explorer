@@ -13,9 +13,9 @@
 <body>
 
   <div class="container">
-    <h1>PDF検索エンジン</h1>
+    <h6 class="display-6">PDF検索エンジン</h6>
 
-    <h3 class="mt-3">情報源</h3>
+    <div class="mt-3">情報源</div>
     <div id="sources">
     </div>
 
@@ -25,21 +25,29 @@
         <input type="text" class="form-control" id="search" placeholder="キーワード入力（コンマ区切り）">
       </div>
 
-      <div class="d-flex flex-row" style="gap: 20px">
+      <div class="d-flex flex-row mt-1" style="gap: 20px">
+
+        <div class="form-check form-switch">
+          <input class="form-check-input" type="checkbox" role="switch" id="and" checked>
+          <label class="form-check-label" for="and">And条件</label>
+        </div>
+
         <div class="form-check form-switch">
           <input class="form-check-input" type="checkbox" role="switch" id="tf-idf" checked>
           <label class="form-check-label" for="tf-idf">TF-IDF</label>
         </div>
+
         <div class="form-check form-switch">
-          <input class="form-check-input" type="checkbox" role="switch" id="select-mode">
-          <label class="form-check-label" for="select-mode">Select Mode</label>
+          <input class="form-check-input" type="checkbox" role="switch" id="select-source">
+          <label class="form-check-label" for="select-source">情報源選択</label>
         </div>
+
       </div>
 
-      <input type="button" class="btn btn-primary" onclick="searchPDF()" value="Submit"></input>
+      <input type="button" class="btn btn-primary mt-1" onclick="searchPDF()" value="Submit"></input>
     </form>
 
-    <table id="search_result_table" class="table table-bordered mt-3">
+    <table id="search_result_table" class="table mt-3">
     </table>
   </div>
 
@@ -56,6 +64,7 @@
       sources.forEach(source => {
         const div = document.createElement('div');
         div.setAttribute('class', 'form-check');
+        div.setAttribute('style', 'font-size: 0.9rem;');
         div.innerHTML = `\
         <input class="form-check-input" type="checkbox" value="${source.base_url}" id="${source.base_url}">\
         <label class="form-check-label" for="${source.base_url}">\
@@ -83,12 +92,13 @@
 
     const search = (sources, limit) => {
       const keywords = document.getElementById('search').value;
+      const and = document.getElementById('and').checked;
       const tf_idf = document.getElementById('tf-idf').checked;
-      const select_mode = document.getElementById('select-mode').checked;
+      const select_source = document.getElementById('select-source').checked;
 
       searchResultTable.innerHTML = '';
 
-      if (select_mode === true) {
+      if (select_source === true) {
         const sourceIds = [];
         sources.forEach(source => {
           const checkbox = document.getElementById(source.base_url);
@@ -97,16 +107,23 @@
           }
         });
 
-        search_(sourceIds, keywords, tf_idf, limit);
+        search_(sourceIds, keywords, and, tf_idf, limit);
 
       } else {
-        search_(null, keywords, tf_idf, limit);
+        search_(null, keywords, and, tf_idf, limit);
       }
     }
 
-    const search_ = async (sourceIds, keywords, tf_idf, limit) => {
+    const search_ = async (sourceIds, keywords, and, tf_idf, limit) => {
 
       if (keywords.trim() == '') return;
+
+      var and_ = "true";
+      if (and === false) {
+        and_ = "false";
+      }
+
+      console.log(and, and_);
 
       var tf_idf_ = "true";
       if (tf_idf === false) {
@@ -115,14 +132,14 @@
 
       var pass;
       if (sourceIds === null) {
-        path = encodeURI(`/search?keywords=${keywords}&tf-idf=${tf_idf_}&limit=${limit}`);
+        path = encodeURI(`/search?keywords=${keywords}&and=${and_}&tf-idf=${tf_idf_}&limit=${limit}`);
       } else {
-        path = encodeURI(`/search?source_ids=${sourceIds.join(',')}&keywords=${keywords}&tf-idf=${tf_idf_}&limit=${limit}`);
+        path = encodeURI(`/search?source_ids=${sourceIds.join(',')}&keywords=${keywords}&and=${and_}&tf-idf=${tf_idf_}&limit=${limit}`);
       }
 
       const response = await fetch(API_BASE_URL + path);
       const searchResult = await response.json();
-      //console.log(`getSearchResult: ${JSON.stringify(searchResult)}`);
+      console.log(`getSearchResult: ${JSON.stringify(searchResult)}`);
 
       const tr = document.createElement('tr')
 
@@ -133,7 +150,6 @@
         tr.append(th);
       });
       const thead = document.createElement('thead');
-      thead.setAttribute('class', 'thead-dark');
       thead.append(tr);
       searchResultTable.append(thead);
 
@@ -148,8 +164,9 @@
               for (key in e.spans) {
                 spans.push(...e.spans[key])
               }
-              //console.log(spans);
-              td.innerHTML = `<div>...${highlightText(e[c], spans)}...</div>`;
+              const sortedSpans = spans.sort(function(a, b) { return a[0] - b[0]; });
+              console.log(sortedSpans);
+              td.innerHTML = `<div>...${highlightText(e[c], sortedSpans)}...</div>`;
               break;
             case 'title':
               const url_title = encodeURI(`/highlight?link_id=${e.link_id}&page=${e.page}&keywords=${keywords}&all_pages=true`)

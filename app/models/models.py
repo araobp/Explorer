@@ -42,11 +42,13 @@ def select_sources():
     )
 
 
-def select_texts(source_ids, keywords, tf_idf, limit):
+def select_texts(source_ids, keywords, and_cond_, tf_idf, limit):
 
     keywords = [e.strip() for e in keywords.split(",")]
-    keywords_ = [f'texts.text LIKE "%{e}%"' for e in keywords]
-    conditions_keywords = " OR ".join(keywords_)
+    keywords_ = [f'(texts.text LIKE "%{e}%")' for e in keywords]
+    like_cond = " AND " if and_cond_ else " OR "
+    conditions_keywords = like_cond.join(keywords_)
+    print(conditions_keywords)
 
     with sqlite3.connect(DB_PATH) as conn:
         cur = conn.cursor()
