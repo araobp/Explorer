@@ -38,11 +38,11 @@ def select_sources():
     with sqlite3.connect(DB_PATH) as conn:
         cur = conn.cursor()
         sources = cur.execute(
-            "SELECT source_id, base_url, homepage_url, org, doc, doc_url FROM sources"
+            "SELECT source_id, base_url, homepage_url, org, doc, doc_url, category FROM sources"
         ).fetchall()
     return to_dict_list(
         sources,
-        columns=["source_id", "base_url", "homepage_url", "org", "doc", "doc_url"],
+        columns=["source_id", "base_url", "homepage_url", "org", "doc", "doc_url", "category"],
     )
 
 
