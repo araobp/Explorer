@@ -138,7 +138,7 @@ def select_texts(source_ids, keywords, and_cond_, tokenize_, tf_idf, limit):
 
 # [Caveat] トークン化した検索ではないので、常にtokenize=Falseで検索した場合のハイライトになる。
 def pdf_highlight(link_id, page, keywords, all_pages):
-    keywords = split_keywords(keyword)
+    keywords = split_keywords(keywords)
 
     with sqlite3.connect(DB_PATH) as conn:
         cur = conn.cursor()
