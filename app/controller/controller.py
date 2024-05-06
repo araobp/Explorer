@@ -3,7 +3,7 @@ import sys
 
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 
-from flask import Blueprint, render_template, jsonify, request, send_file
+from flask import Blueprint, render_template, jsonify, request, send_file, abort
 from models import models
 
 LIMIT = 200  # SQLiteで検索するレコード数上限のデフォルト値
@@ -35,7 +35,10 @@ def search():
     tokenize_ = True if tokenize == "true" else False
     tf_idf_ = True if tf_idf == "true" else False
 
-    return jsonify(models.select_texts(source_ids, keywords, and_cond_, tokenize_, tf_idf_, limit))
+    resp = models.select_texts(
+        source_ids, keywords, and_cond_, tokenize_, tf_idf_, limit
+    )
+    return jsonify(resp)
 
 
 @main.route("/highlight")

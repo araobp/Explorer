@@ -96,7 +96,7 @@
         td.setAttribute('style', 'border-bottom: none !important;');
         const ul = document.createElement('ul');
         ul.setAttribute('style', 'padding-left: 0 !important; margin-bottom: 0 !important;');
-        sourcesByCategory[category].forEach(s =>{
+        sourcesByCategory[category].forEach(s => {
           const li = document.createElement('li');
           li.setAttribute('style', 'list-style-type: none;');
           li.innerHTML = `\
@@ -164,15 +164,25 @@
       if (keywords.trim() == '') return;
 
       var pass;
+
       if (sourceIds === null) {
         path = encodeURI(`/search?keywords=${keywords}&and=${and}&tokenize=${tokenize}&tf-idf=${tf_idf}&limit=${limit}`);
       } else {
         path = encodeURI(`/search?source_ids=${sourceIds.join(',')}&keywords=${keywords}&and=${and}&tokenize=${tokenize}&tf-idf=${tf_idf}&limit=${limit}`);
       }
 
+      searchResultTable.innerHTML = '<div class="spinner-border text-secondary" role="status"><span class="visually-hidden">検索中...</span></div>';
+
       const response = await fetch(API_BASE_URL + path);
       const searchResult = await response.json();
       //console.log(`getSearchResult: ${JSON.stringify(searchResult)}`);
+
+      searchResultTable.innerHTML = '';
+
+      if (searchResult.length === 0) {
+        searchResultTable.innerText = 'キーワードにマッチする資料はありません。'
+        return;
+      }
 
       const tr = document.createElement('tr')
 
