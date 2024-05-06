@@ -25,7 +25,7 @@ O'Reillyの実践自然言語処理 7.1 情報検索を参考にアーキテク�
 ## 部品/フレームワーク
 
 - Jupyter Notebook, PyMuPDF, spaCy
-- SQLite
+- SQLite3
 - Flask
 - HTML5, Bootstrap5
 
