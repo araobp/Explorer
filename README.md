@@ -1,5 +1,10 @@
 # PDF Search
 
+<img src="docs/screenshot.jpg" width=700>
+
+Webアプリ画面(2024/05/06時点)
+
+
 ## 背景
 
 2024/05/01にプロジェクト開始。社内外情報収集ツールとしてPDF検索エンジンを開発。私の趣味として開発するが、仕事での利用も想定する。
@@ -8,7 +13,7 @@
 
 ## 開発計画
 
-- Step1: 団体や企業が公開するPDF資料（白書やIR資料など）をキーワードで検索し、ヒットしたページをキーワードハイライトしながら表示する。まずは、日本の各省庁が公開する白書から始めるが、自治体や企業が公開する中期計画資料等も含めていく。
+- Step1: 団体や企業が公開するPDF資料（白書やIR資料など）をキーワードで検索し、ヒットしたページをキーワードハイライトしながら表示する。まずは、日本の各省庁が公開する白書から始めるが、自治体や企業が公開する中期計画資料等も含めていく。=> 2024/05/06 完了
 - Step2: キーワードのランキングを生成する：Betweenness, TF-IDFなど。キーワード候補を表示する。
 - Step3: ナレッジグラフを作成する。ナレッジグラフからもPDF検索。
 
@@ -34,9 +39,9 @@ O'Reillyの実践自然言語処理 7.1 情報検索を参考にアーキテク�
 ### クローラー
 
 上から順番に実行するが、データ更新時は個別に実行することも可能。
-- [CrawlerSources.ipynb](1_CrawlerSources.ipynb) -- SQLite上の"sources"テーブル作成とデータ登録
-- [CrawlerLinks.ipynb](2_CrawlerLinks.ipynb) -- SQLite上の"links"テーブル作成とデータ登録
-- [CrawlerTexts.ipynb](3_CrawlerTexts.ipynb) -- SQLite上の"texts"テーブル作成とデータ登録
+- [1_CrawlerSources.ipynb](1_CrawlerSources.ipynb) -- SQLite上の"sources"テーブル作成とデータ登録
+- [2_CrawlerLinks.ipynb](2_CrawlerLinks.ipynb) -- SQLite上の"links"テーブル作成とデータ登録
+- [3_CrawlerTexts.ipynb](3_CrawlerTexts.ipynb) -- SQLite上の"texts"テーブル作成とデータ登録
 
 ### データベース
 
