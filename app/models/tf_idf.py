@@ -24,9 +24,9 @@ class RegexMatcher:
         self.matcher = re.compile(f'{"|".join(keywords)}')
 
     # as_spans 引数は使わない：spaCyのPhraseMatcherと合わせるため便箋上確保した引数。
-    def __call__(self, doc, as_spans=True):
-        original_text = doc.text
-        #print(original_text)
+    def __call__(self, text, as_spans=True):
+        original_text = text
+        # print(original_text)
         spans = []
         for m in self.matcher.finditer(original_text):
             keyword = m.group(0)
@@ -78,7 +78,12 @@ def simple_match(keywords, texts, tokenize=True):
 
     result = []
     idx = 0
-    for doc in nlp.pipe(texts):
+    if tokenize:
+        pipe = nlp.pipe(texts)
+    else:
+        pipe = texts
+
+    for doc in pipe:
         span_dict, _ = generate_span_dict(matcher, doc)
 
         if len(span_dict) != 0:
@@ -111,11 +116,11 @@ TF-IDF計算関数
 def calc_tf_idf(keywords, texts, tokenize=True):
     matcher = create_matcher(keywords, "TF-IDF", tokenize)
 
-    def tf(texts):
+    def tf(pipe):
         all_tf = []
         all_span = []
 
-        for doc in nlp.pipe(texts):
+        for doc in pipe:
 
             span_dict, cnt = generate_span_dict(matcher, doc)
 
@@ -169,7 +174,12 @@ def calc_tf_idf(keywords, texts, tokenize=True):
 
         return score
 
-    all_tf, all_span = tf(texts)
+    if tokenize:
+        pipe = nlp.pipe(texts)
+    else:
+        pipe = texts
+    all_tf, all_span = tf(pipe)
+
     all_idf = idf(all_tf, texts)
     all_tf_idf = tf_idf(all_tf, all_idf)
     sorted_score_desc = sort(all_tf_idf, texts)  # 降順でソートした結果
