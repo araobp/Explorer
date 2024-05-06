@@ -21,21 +21,21 @@ class Span:
 class RegexMatcher:
 
     def __init__(self, keywords):
-        self.pattern = f'{"|".join(keywords)}'
+        self.matcher = re.compile(f'{"|".join(keywords)}')
 
     # as_spans 引数は使わない：spaCyのPhraseMatcherと合わせるため便箋上確保した引数。
     def __call__(self, doc, as_spans=True):
         original_text = doc.text
         #print(original_text)
         spans = []
-        for m in re.finditer(self.pattern, original_text):
+        for m in self.matcher.finditer(original_text):
             keyword = m.group(0)
             span = Span(text=keyword, start_char=m.start(), end_char=m.end())
             spans.append(span)
         return spans
 
 
-def generate_matcher(keywords, name, tokenize=True):
+def create_matcher(keywords, name, tokenize=True):
     if tokenize:
         patterns = [nlp(e) for e in keywords]
         matcher = PhraseMatcher(nlp.vocab)
@@ -74,7 +74,7 @@ TF-IDF無しの単純なトークンベースマッチ
 
 
 def simple_match(keywords, texts, tokenize=True):
-    matcher = generate_matcher(keywords, "simple match", tokenize)
+    matcher = create_matcher(keywords, "simple match", tokenize)
 
     result = []
     idx = 0
@@ -109,7 +109,7 @@ TF-IDF計算関数
 
 
 def calc_tf_idf(keywords, texts, tokenize=True):
-    matcher = generate_matcher(keywords, "TF-IDF", tokenize)
+    matcher = create_matcher(keywords, "TF-IDF", tokenize)
 
     def tf(texts):
         all_tf = []
