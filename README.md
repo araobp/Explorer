@@ -39,9 +39,9 @@ O'Reillyの実践自然言語処理 7.1 情報検索を参考にアーキテク�
 ### クローラー
 
 上から順番に実行するが、データ更新時は個別に実行することも可能。
-- [CrawlerSources.ipynb](1_CrawlerSources.ipynb) -- SQLite上の"sources"テーブル作成とデータ登録
-- [CrawlerLinks.ipynb](2_CrawlerLinks.ipynb) -- SQLite上の"links"テーブル作成とデータ登録
-- [CrawlerTexts.ipynb](3_CrawlerTexts.ipynb) -- SQLite上の"texts"テーブル作成とデータ登録
+- [1_CrawlerSources.ipynb](1_CrawlerSources.ipynb) -- SQLite上の"sources"テーブル作成とデータ登録
+- [2_CrawlerLinks.ipynb](2_CrawlerLinks.ipynb) -- SQLite上の"links"テーブル作成とデータ登録
+- [3_CrawlerTexts.ipynb](3_CrawlerTexts.ipynb) -- SQLite上の"texts"テーブル作成とデータ登録
 
 ### データベース
 
